@@ -6,6 +6,7 @@ require("dotenv").config();
 const { Client, GatewayIntentBits, Collection, REST, Routes } = require("discord.js");
 const fs = require("fs");
 const path = require("path");
+const { init } = require("./ratingsManager");
 
 const client = new Client({
   intents: [
@@ -32,6 +33,14 @@ for (const file of commandFiles) {
 }
 
 client.once("ready", async () => {
+  // Inicializar base de datos PostgreSQL
+  try {
+    await init();
+    console.log("[BOT] ✅ Base de datos PostgreSQL conectada.");
+  } catch (error) {
+    console.error("[BOT] ❌ Error al conectar la base de datos:", error);
+  }
+
   console.log(`\n╔════════════════════════════════════╗`);
   console.log(`║   META RP — Bot de Calificaciones  ║`);
   console.log(`╠════════════════════════════════════╣`);
