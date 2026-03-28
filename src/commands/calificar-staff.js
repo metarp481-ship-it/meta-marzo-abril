@@ -50,7 +50,6 @@ module.exports = {
     const opinion     = interaction.options.getString("opinion_personal");
     const autor       = interaction.member;
 
-    // Verificar que el comando se ejecute solo en el canal permitido
     if (interaction.channelId !== CANAL_CALIFICACIONES_ID) {
       return interaction.reply({
         content: `❌ | Solo podés usar este comando en <#${CANAL_CALIFICACIONES_ID}>.`,
@@ -72,8 +71,8 @@ module.exports = {
       });
     }
 
-    addRating(staffMember.id, estrellas, autor.id, opinion);
-    const stats  = getStats(staffMember.id);
+    await addRating(staffMember.id, estrellas, autor.id, opinion);
+    const stats  = await getStats(staffMember.id);
     const hora   = buildFecha();
     const avatar = autor.user.displayAvatarURL({ size: 256 });
 
@@ -100,7 +99,6 @@ module.exports = {
       });
     }
 
-    // El embed se envía SOLO al canal de registro
     await canalRegistro.send({ content: `${staffMember}`, embeds: [embed] });
 
     return interaction.reply({
