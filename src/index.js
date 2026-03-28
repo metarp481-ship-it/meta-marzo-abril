@@ -44,7 +44,7 @@ client.once("ready", async () => {
   console.log(`║  ✅ Online como: ${client.user.tag.padEnd(18)}║`);
   console.log(`║  📡 Servidores : ${String(client.guilds.cache.size).padEnd(18)}║`);
   console.log(`╚════════════════════════════════════╝\n`);
-  client.user.setActivity("⭐ Calificando staff | META RP", { type: 3 });
+  client.user.setActivity("Dev; @vladimirfernan.", { type: 3 });
 
   // ── Auto-registro de comandos slash al iniciar ──
   try {
