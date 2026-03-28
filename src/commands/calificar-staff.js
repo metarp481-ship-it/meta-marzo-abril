@@ -2,7 +2,6 @@
 //  META RP — Comando /calificar-staff
 //  Desarrollado por Vladimir
 // ─────────────────────────────────────────────
-
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const { ROL_STAFF_ID, CANAL_CALIFICACIONES_ID, CANAL_REGISTRO_ID } = require("../config");
 const { addRating, getStats } = require("../ratingsManager");
@@ -51,6 +50,14 @@ module.exports = {
     const opinion     = interaction.options.getString("opinion_personal");
     const autor       = interaction.member;
 
+    // Verificar que el comando se ejecute solo en el canal permitido
+    if (interaction.channelId !== CANAL_CALIFICACIONES_ID) {
+      return interaction.reply({
+        content: `❌ | Solo podés usar este comando en <#${CANAL_CALIFICACIONES_ID}>.`,
+        ephemeral: true,
+      });
+    }
+
     if (!staffMember || !staffMember.roles.cache.has(ROL_STAFF_ID)) {
       return interaction.reply({
         content: "😡 | Ese no es STAFF, bobo!",
@@ -66,13 +73,15 @@ module.exports = {
     }
 
     addRating(staffMember.id, estrellas, autor.id, opinion);
-    const stats = getStats(staffMember.id);
-    const hora  = buildFecha();
+    const stats  = getStats(staffMember.id);
+    const hora   = buildFecha();
+    const avatar = autor.user.displayAvatarURL({ size: 256 });
 
     const embed = new EmbedBuilder()
       .setColor(0xf1c40f)
       .setTitle("✅ | Calificación Staff — Registrada")
       .setDescription("Tu opinion nos ayuda a mejorar cada dia, muchas gracias.")
+      .setThumbnail(avatar)
       .addFields(
         { name: "👤 | Usuario",          value: `${autor}`,            inline: true },
         { name: "🔵 | Staff calificado", value: `${staffMember}`,      inline: true },
@@ -82,17 +91,16 @@ module.exports = {
       )
       .setFooter({ text: `© Todos los derechos reservados 2026, META RP | ER:LC • hoy a las ${hora}` });
 
-    const canalPublico  = interaction.guild.channels.cache.get(CANAL_CALIFICACIONES_ID);
     const canalRegistro = interaction.guild.channels.cache.get(CANAL_REGISTRO_ID);
 
-    if (!canalPublico || !canalRegistro) {
+    if (!canalRegistro) {
       return interaction.reply({
-        content: "❌ | Error: canales no encontrados. Contactá al administrador.",
+        content: "❌ | Error: canal de registro no encontrado. Contactá al administrador.",
         ephemeral: true,
       });
     }
 
-    await canalPublico.send({ content: `${staffMember}`, embeds: [embed] });
+    // El embed se envía SOLO al canal de registro
     await canalRegistro.send({ content: `${staffMember}`, embeds: [embed] });
 
     return interaction.reply({
